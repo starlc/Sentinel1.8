@@ -1,0 +1,38 @@
+@startuml
+title SphU.asyncEntry方法调用流程
+
+participant "Client" as client
+participant "SphU" as sphu
+participant "Env.sph" as sph
+participant "CtSph" as ctsph
+participant "SlotChain" as slotchain
+participant "Slot" as slot
+
+client -> sphu : asyncEntry(name, type, count, args)
+activate sphu
+sphu -> sph : asyncEntry(name, type, count, args)
+activate sph
+sph -> ctsph : asyncEntry(ResourceWrapper, type, count, args)
+activate ctsph
+ctsph -> ctsph : entryWithType(resourceWrapper, type, count, false, args)
+ctsph -> slotchain : entry(context, resourceWrapper, node, count, false, args)
+activate slotchain
+
+loop 遍历所有插槽
+    slotchain -> slot : entry(context, resourceWrapper, node, count, false, args)
+    activate slot
+    note right: 依次经过NodeSelectorSlot、ClusterBuilderSlot、StatisticSlot、SystemSlot、AuthoritySlot、FlowSlot、DegradeSlot等
+    slot --> slotchain
+    deactivate slot
+end
+
+slotchain --> ctsph : AsyncEntry
+deactivate slotchain
+ctsph --> sph : AsyncEntry
+deactivate ctsph
+sph --> sphu : AsyncEntry
+deactivate sph
+sphu --> client : AsyncEntry
+deactivate sphu
+
+@enduml
