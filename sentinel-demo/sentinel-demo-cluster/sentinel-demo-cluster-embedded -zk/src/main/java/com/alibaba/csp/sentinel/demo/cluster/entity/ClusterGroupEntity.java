@@ -28,8 +28,10 @@ public class ClusterGroupEntity {
     private String ip;
     private Integer port;
 
-    private Set<String> clientSet;
+    private Set<String> nameSpaceSet;
     private Map<String,ClientEntiry> clientMap;
+
+    private Integer idleSecond;
 
     public String getMachineId() {
         return machineId;
@@ -58,12 +60,12 @@ public class ClusterGroupEntity {
         return this;
     }
 
-    public Set<String> getClientSet() {
-        return clientSet;
+    public Set<String> getNameSpaceSet() {
+        return nameSpaceSet;
     }
 
-    public ClusterGroupEntity setClientSet(Set<String> clientSet) {
-        this.clientSet = clientSet;
+    public ClusterGroupEntity setNameSpaceSet(Set<String> nameSpaceSet) {
+        this.nameSpaceSet = nameSpaceSet;
         return this;
     }
 
@@ -75,13 +77,23 @@ public class ClusterGroupEntity {
         return this; 
     }
 
+    public Integer getIdleSecond() {
+        return idleSecond;
+    }
+
+    public void setIdleSecond(Integer idleSecond) {
+        this.idleSecond = idleSecond;
+    }
+
     @Override
     public String toString() {
         return "ClusterGroupEntity{" +
-            "machineId='" + machineId + '\'' +
-            ", ip='" + ip + '\'' +
-            ", port=" + port +
-            ", clientSet=" + clientSet +
-            '}';
+                "machineId='" + machineId + '\'' +
+                ", ip='" + ip + '\'' +
+                ", port=" + port +
+                ", nameSpaceSet=" + nameSpaceSet +
+                ", clientMap=" + clientMap +
+                ", idleSecond=" + idleSecond +
+                '}';
     }
 }

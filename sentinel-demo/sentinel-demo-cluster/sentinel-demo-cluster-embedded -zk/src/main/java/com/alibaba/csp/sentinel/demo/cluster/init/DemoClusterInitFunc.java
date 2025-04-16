@@ -195,7 +195,7 @@ public class DemoClusterInitFunc implements InitFunc {
         // 如果当前机器属于任何Token Server组的客户端集合，则它是Token Client
         // 否则它是未分配的，应该设置为NOT_STARTED
         boolean canBeClient = groupList.stream()
-            .flatMap(e -> e.getClientSet().stream())
+            .flatMap(e -> e.getNameSpaceSet().stream())
             .filter(Objects::nonNull)
             .anyMatch(e -> e.equals(getCurrentMachineId()));
         return canBeClient ? ClusterStateManager.CLUSTER_CLIENT : ClusterStateManager.CLUSTER_NOT_STARTED;
@@ -220,7 +220,7 @@ public class DemoClusterInitFunc implements InitFunc {
         // 从目标服务器组的客户端集合中构建客户端分配配置
         for (ClusterGroupEntity group : groupList) {
             // 如果当前机器在某个服务器组的客户端集合中，则返回该服务器组的IP和端口
-            if (group.getClientSet().contains(getCurrentMachineId())) {
+            if (group.getNameSpaceSet().contains(getCurrentMachineId())) {
                 String ip = group.getIp();
                 Integer port = group.getPort();
                 return Optional.of(new ClusterClientAssignConfig(ip, port));

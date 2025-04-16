@@ -1,4 +1,4 @@
-package com.alibaba.csp.sentinel.datasource.zookeeper;
+package com.alibaba.csp.sentinel.demo.cluster.datasource;
 
 import com.alibaba.csp.sentinel.concurrent.NamedThreadFactory;
 import com.alibaba.csp.sentinel.datasource.AbstractDataSource;
@@ -9,7 +9,6 @@ import com.alibaba.csp.sentinel.util.StringUtil;
 import org.apache.curator.framework.AuthInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -63,20 +62,8 @@ public class ZookeeperPathDataSource extends AbstractDataSource<String, List<Flo
      * @param path 配置存储的节点路径，该路径下的所有子节点将被监听
      * @param parser 将ZooKeeper中存储的字符串转换为FlowRule对象的转换器
      */
-    public ZookeeperPathDataSource(final String serverAddr, final String path, Converter<String, FlowRule> parser) {
-        super(source -> {
-            // 将单个FlowRule转换为List<FlowRule>的适配器
-            try {
-                if (StringUtil.isBlank(source)) {
-                    return new ArrayList<>();
-                }
-                FlowRule rule = parser.convert(source);
-                return Collections.singletonList(rule);
-            } catch (Exception e) {
-                RecordLog.warn("[ZookeeperPathDataSource] Failed to parse source: " + source, e);
-                return new ArrayList<>();
-            }
-        });
+    public ZookeeperPathDataSource(final String serverAddr, final String path, Converter<String, List<FlowRule>> parser) {
+        super(parser);
         
         if (StringUtil.isBlank(serverAddr) || StringUtil.isBlank(path)) {
             throw new IllegalArgumentException(String.format("Bad argument: serverAddr=[%s], path=[%s]", serverAddr, path));
@@ -96,7 +83,7 @@ public class ZookeeperPathDataSource extends AbstractDataSource<String, List<Flo
      * @param parser 将ZooKeeper中存储的字符串转换为FlowRule对象的转换器
      */
     public ZookeeperPathDataSource(final String serverAddr, final String groupId, final String dataId,
-                               Converter<String, FlowRule> parser) {
+                               Converter<String, List<FlowRule>> parser) {
         this(serverAddr, getPath(groupId, dataId), parser);
     }
 
