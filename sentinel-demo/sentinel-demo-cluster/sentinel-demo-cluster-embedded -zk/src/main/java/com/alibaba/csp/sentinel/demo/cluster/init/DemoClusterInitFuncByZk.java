@@ -95,13 +95,14 @@ public class DemoClusterInitFuncByZk implements InitFunc {
 
     private void initDynamicRuleProperty() {
         // 创建流控规则的Zookeeper数据源，从Zookeeper配置中心读取流控规则
-        // sentinelFlowDataId格式为：customized-flow-rules
+        // sentinelFlowDataId格式为：sentinel-flow-rules
         ReadableDataSource<String, List<FlowRule>> ruleSource = new ZookeeperPathDataSource(remoteAddress, groupId,
                 sentinelFlowDataId, sentinelConvert);
         // 将数据源注册到FlowRuleManager，用于单机模式下的流控规则管理
         FlowRuleManager.register2Property(ruleSource.getProperty());
 
         //加载自定义流控规则的zookeeper数据源，从Zookeeper配置中心读取流控规则
+        // sentinelFlowDataId格式为：customized-flow-rules
         ReadableDataSource<String, List<FlowRule>> customizedSource = new ZookeeperPathDataSource(remoteAddress, groupId,
                 customizedFlowDataId, customizedConvert);
         // 将数据源注册到FlowRuleManager，用于单机模式下的流控规则管理
