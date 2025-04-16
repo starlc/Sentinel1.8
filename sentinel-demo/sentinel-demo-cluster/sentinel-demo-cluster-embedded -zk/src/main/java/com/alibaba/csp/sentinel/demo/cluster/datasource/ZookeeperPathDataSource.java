@@ -98,20 +98,8 @@ public class ZookeeperPathDataSource extends AbstractDataSource<String, List<Flo
      * @param parser 将ZooKeeper中存储的字符串转换为FlowRule对象的转换器
      */
     public ZookeeperPathDataSource(final String serverAddr, final List<AuthInfo> authInfos, final String groupId, final String dataId,
-                               Converter<String, FlowRule> parser) {
-        super(source -> {
-            // 将单个FlowRule转换为List<FlowRule>的适配器
-            try {
-                if (StringUtil.isBlank(source)) {
-                    return new ArrayList<>();
-                }
-                FlowRule rule = parser.convert(source);
-                return Collections.singletonList(rule);
-            } catch (Exception e) {
-                RecordLog.warn("[ZookeeperPathDataSource] Failed to parse source: " + source, e);
-                return new ArrayList<>();
-            }
-        });
+            Converter<String, List<FlowRule>> parser) {
+        super(parser);
         
         if (StringUtil.isBlank(serverAddr) || StringUtil.isBlank(groupId) || StringUtil.isBlank(dataId)) {
             throw new IllegalArgumentException(String.format("Bad argument: serverAddr=[%s], authInfos=[%s], groupId=[%s], dataId=[%s]", serverAddr, authInfos, groupId, dataId));
