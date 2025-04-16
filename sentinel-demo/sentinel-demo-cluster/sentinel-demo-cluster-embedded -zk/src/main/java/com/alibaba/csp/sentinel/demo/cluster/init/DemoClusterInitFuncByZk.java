@@ -25,7 +25,6 @@ import com.alibaba.csp.sentinel.cluster.client.config.ClusterClientConfig;
 import com.alibaba.csp.sentinel.cluster.client.config.ClusterClientConfigManager;
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterFlowRuleManager;
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterParamFlowRuleManager;
-import com.alibaba.csp.sentinel.cluster.registry.ConfigSupplierRegistry;
 import com.alibaba.csp.sentinel.cluster.server.config.ClusterServerConfigManager;
 import com.alibaba.csp.sentinel.cluster.server.config.ServerTransportConfig;
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
@@ -51,12 +50,13 @@ public class DemoClusterInitFuncByZk implements InitFunc {
 
     private static final String APP_NAME = AppNameUtil.getAppName();
 
-    private final String remoteAddress = "localhost:8848";
-    private final String groupId = "SENTINEL_GROUP";
+    private final String remoteAddress = "localhost:2181";
+    private final String groupId = "agree/flow";
 
-    private final String flowDataId = APP_NAME + DemoConstants.FLOW_POSTFIX;
+    private final String sentinelFlowDataId = "sentinelFlow";
+    private final String customizedFlowDataId = "sentinelFlow";
     private final String paramDataId = APP_NAME + DemoConstants.PARAM_FLOW_POSTFIX;
-    private final String configDataId = APP_NAME + "-cluster-client-config";
+    private final String configDataId = "cluster-client-config";
     private final String clusterMapDataId = APP_NAME + DemoConstants.CLUSTER_MAP_POSTFIX;
 
     private final String PRE_PATH = "/agree/flow";
@@ -91,13 +91,13 @@ public class DemoClusterInitFuncByZk implements InitFunc {
     private void initDynamicRuleProperty() {
         // 创建流控规则的Zookeeper数据源，从Zookeeper配置中心读取流控规则
         // flowDataId格式为：${appName}-flow-rules
-        ReadableDataSource<String, List<FlowRule>> ruleSource = new ZookeeperDataSource<>(remoteAddress, PRE_PATH, source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {}));
+        ReadableDataSource<String, List<FlowRule>> ruleSource = new ZookeeperDataSource<>(remoteAddress, groupId,sentinelFlowDataId, source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {}));
         // 将数据源注册到FlowRuleManager，用于单机模式下的流控规则管理
         FlowRuleManager.register2Property(ruleSource.getProperty());
 
         // 创建参数流控规则的Nacos数据源，从Nacos配置中心读取参数流控规则
         // paramDataId格式为：${appName}-param-rules
-        ReadableDataSource<String, List<ParamFlowRule>> paramRuleSource = new ZookeeperDataSource<>(remoteAddress, PRE_PATH, source -> JSON.parseObject(source, new TypeReference<List<ParamFlowRule>>() {}));
+        ReadableDataSource<String, List<ParamFlowRule>> paramRuleSource = new ZookeeperDataSource<>(remoteAddress, groupId,customizedFlowDataId, source -> JSON.parseObject(source, new TypeReference<List<ParamFlowRule>>() {}));
         // 将数据源注册到ParamFlowRuleManager，用于单机模式下的参数流控规则管理
         ParamFlowRuleManager.register2Property(paramRuleSource.getProperty());
     }
@@ -105,7 +105,7 @@ public class DemoClusterInitFuncByZk implements InitFunc {
     private void initClientConfigProperty() {
         // 创建客户端配置的ZooKeeper数据源，从ZooKeeper配置中心读取客户端配置
         // configDataId格式为：${appName}-cluster-client-config
-        ReadableDataSource<String, ClusterClientConfig> clientConfigDs = new ZookeeperDataSource<>(remoteAddress, PRE_PATH + "/" + configDataId, 
+        ReadableDataSource<String, ClusterClientConfig> clientConfigDs = new ZookeeperDataSource<>(remoteAddress, groupId,configDataId,
             source -> JSON.parseObject(source, new TypeReference<ClusterClientConfig>() {}));
         // 将数据源注册到ClusterClientConfigManager，用于管理客户端配置（如请求超时时间等）
         ClusterClientConfigManager.registerClientConfigProperty(clientConfigDs.getProperty());
@@ -183,15 +183,6 @@ public class DemoClusterInitFuncByZk implements InitFunc {
         });
         // 将数据源注册到ClusterStateManager，用于管理集群状态
         ClusterStateManager.registerProperty(clusterModeDs.getProperty());
-    }
-
-    private void initNaseSpace() {
-        // 创建命名空间的Nacos数据源，从Nacos配置中心读取命名空间
-        ReadableDataSource<String, String> namespaceDs = new ZookeeperDataSource<>(remoteAddress, groupId, flowDataId,
-            source -> source);
-        // 将数据源注册到NamespaceUtil，用于管理命名空间
-        // NamespaceUtil.registerNamespaceProp(namespaceDs.getProperty());
-        ConfigSupplierRegistry.setNamespaceSupplier(null);
     }
 
     private int extractMode(List<ClusterGroupEntity> groupList) {

@@ -61,27 +61,27 @@ public class DemoClusterInitFunc implements InitFunc {
     public void init() throws Exception {
         // Register client dynamic rule data source.
         // 初始化动态规则属性，从Nacos加载流控规则和参数流控规则
-        initDynamicRuleProperty();
-
-        // Register token client related data source.
-        // Token client common config:
-        // 初始化客户端配置属性，包括请求超时时间等
-        initClientConfigProperty();
-        // Token client assign config (e.g. target token server) retrieved from assign map:
-        // 初始化客户端服务器分配属性，确定当前客户端应该连接哪个Token Server
-        initClientServerAssignProperty();
-
-        // Register token server related data source.
-        // Register dynamic rule data source supplier for token server:
-        // 注册集群规则提供者，为Token Server提供动态规则数据源
-        registerClusterRuleSupplier();
-        // Token server transport config extracted from assign map:
-        // 初始化服务器传输配置属性，包括服务器端口等
-        initServerTransportConfigProperty();
-
-        // Init cluster state property for extracting mode from cluster map data source.
-        // 初始化集群状态属性，从集群映射数据源中提取模式（客户端/服务器/未启动）
-        initStateProperty();
+//        initDynamicRuleProperty();
+//
+//        // Register token client related data source.
+//        // Token client common config:
+//        // 初始化客户端配置属性，包括请求超时时间等
+//        initClientConfigProperty();
+//        // Token client assign config (e.g. target token server) retrieved from assign map:
+//        // 初始化客户端服务器分配属性，确定当前客户端应该连接哪个Token Server
+//        initClientServerAssignProperty();
+//
+//        // Register token server related data source.
+//        // Register dynamic rule data source supplier for token server:
+//        // 注册集群规则提供者，为Token Server提供动态规则数据源
+//        registerClusterRuleSupplier();
+//        // Token server transport config extracted from assign map:
+//        // 初始化服务器传输配置属性，包括服务器端口等
+//        initServerTransportConfigProperty();
+//
+//        // Init cluster state property for extracting mode from cluster map data source.
+//        // 初始化集群状态属性，从集群映射数据源中提取模式（客户端/服务器/未启动）
+//        initStateProperty();
     }
 
     private void initDynamicRuleProperty() {

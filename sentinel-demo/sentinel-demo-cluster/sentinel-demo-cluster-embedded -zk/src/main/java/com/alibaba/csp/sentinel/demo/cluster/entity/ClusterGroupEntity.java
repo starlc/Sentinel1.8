@@ -21,7 +21,6 @@ import java.util.Map;
 /**
  * @author Eric Zhao
  * @since 1.4.1
- *
  */
 public class ClusterGroupEntity {
 
@@ -85,6 +84,4 @@ public class ClusterGroupEntity {
             ", clientSet=" + clientSet +
             '}';
     }
-
-
 }

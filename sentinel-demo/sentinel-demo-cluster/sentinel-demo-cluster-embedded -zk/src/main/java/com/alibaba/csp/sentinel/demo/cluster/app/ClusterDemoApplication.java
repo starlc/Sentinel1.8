@@ -15,6 +15,9 @@
  */
 package com.alibaba.csp.sentinel.demo.cluster.app;
 
+import com.alibaba.csp.sentinel.demo.cluster.init.DemoClusterInitFuncByZk;
+import com.alibaba.csp.sentinel.init.InitExecutor;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -24,7 +27,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ClusterDemoApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        triggerSentinelInit();
         SpringApplication.run(ClusterDemoApplication.class, args);
+        InitExecutor.doInit();
+        DemoClusterInitFuncByZk demoClusterInitFuncByZk = new DemoClusterInitFuncByZk();
+        demoClusterInitFuncByZk.init();
+    }
+    private static void triggerSentinelInit() {
+        new Thread(() -> InitExecutor.doInit()).start();
     }
 }
