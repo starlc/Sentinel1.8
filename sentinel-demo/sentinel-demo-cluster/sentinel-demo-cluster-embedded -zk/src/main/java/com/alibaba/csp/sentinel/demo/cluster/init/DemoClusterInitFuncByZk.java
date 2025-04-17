@@ -34,10 +34,9 @@ import com.alibaba.csp.sentinel.demo.cluster.convert.CustomizedConvert;
 import com.alibaba.csp.sentinel.demo.cluster.convert.SentinelConvert;
 import com.alibaba.csp.sentinel.demo.cluster.datasource.ZookeeperPathDataSource;
 import com.alibaba.csp.sentinel.demo.cluster.entity.ClusterGroupEntity;
+import com.alibaba.csp.sentinel.demo.cluster.manager.MultipleDataSourceManager;
 import com.alibaba.csp.sentinel.init.InitFunc;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.csp.sentinel.transport.config.TransportConfig;
 import com.alibaba.csp.sentinel.util.AppNameUtil;
 import com.alibaba.csp.sentinel.util.HostNameUtil;
@@ -93,7 +92,7 @@ public class DemoClusterInitFuncByZk implements InitFunc {
         initStateProperty();
     }
 
-    private void initDynamicRuleProperty() {
+    /* private void initDynamicRuleProperty() {
         // 创建流控规则的Zookeeper数据源，从Zookeeper配置中心读取流控规则
         // sentinelFlowDataId格式为：sentinel-flow-rules
         ReadableDataSource<String, List<FlowRule>> ruleSource = new ZookeeperPathDataSource(remoteAddress, groupId,
@@ -108,7 +107,25 @@ public class DemoClusterInitFuncByZk implements InitFunc {
         // 将数据源注册到FlowRuleManager，用于单机模式下的流控规则管理
         FlowRuleManager.register2Property(customizedSource.getProperty());
 
+    } */
 
+    private void initDynamicRuleProperty() throws Exception {
+        // 获取多数据源管理器实例
+        MultipleDataSourceManager manager = MultipleDataSourceManager.getInstance();
+        
+        // 创建流控规则的Zookeeper数据源，从Zookeeper配置中心读取流控规则
+        // sentinelFlowDataId格式为：sentinel-flow-rules
+        ReadableDataSource<String, List<FlowRule>> ruleSource = new ZookeeperPathDataSource(remoteAddress, groupId,
+                sentinelFlowDataId, sentinelConvert);
+        // 注册数据源到管理器
+        manager.registerDataSource("default", ruleSource);
+
+        // 加载自定义流控规则的zookeeper数据源，从Zookeeper配置中心读取流控规则
+        // customizedFlowDataId格式为：customized-flow-rules
+        ReadableDataSource<String, List<FlowRule>> customizedSource = new ZookeeperPathDataSource(remoteAddress, groupId,
+                customizedFlowDataId, customizedConvert);
+        // 注册数据源到管理器
+        manager.registerDataSource("customized", customizedSource);
     }
 
     private void initClientConfigProperty() {
