@@ -46,7 +46,7 @@ public class MultipleDataSourceManager {
     /**
      * 合并后的规则属性
      */
-    private final DynamicSentinelProperty<List<FlowRule>> mergedProperty = new DynamicSentinelProperty<>();
+    private final SentinelProperty<List<FlowRule>> mergedProperty = new DynamicSentinelProperty<>();
     
     /**
      * 存储每个数据源最新的规则
