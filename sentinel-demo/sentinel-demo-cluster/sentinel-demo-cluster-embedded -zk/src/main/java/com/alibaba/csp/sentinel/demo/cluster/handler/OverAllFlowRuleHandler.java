@@ -3,14 +3,13 @@ package com.alibaba.csp.sentinel.demo.cluster.handler;
 import com.alibaba.csp.sentinel.demo.cluster.entity.CustomizedFlowRule;
 import com.alibaba.csp.sentinel.demo.cluster.entity.FlowRuleEntity;
 
-public class CustomizedFlowRuleHandler extends AbstractHandler  {
-
-    private static final int STATUS_DEFALUT = 5;
+public class OverAllFlowRuleHandler extends AbstractHandler {
+    private static final int OVERALL_STATUS = 0;
 
 
     @Override
     public int getStatus() {
-        return STATUS_DEFALUT;
+        return OVERALL_STATUS;
     }
 
     @Override

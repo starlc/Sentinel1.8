@@ -1,28 +1,30 @@
 package com.alibaba.csp.sentinel.demo.cluster.factory;
 
-import com.alibaba.csp.sentinel.demo.cluster.handler.Handler;
+import com.alibaba.csp.sentinel.demo.cluster.handler.AbstractHandler;
 import com.alibaba.csp.sentinel.demo.cluster.handler.CustomizedFlowRuleHandler;
-import com.alibaba.csp.sentinel.demo.cluster.handler.SentinelFlowRuleHandler;
-import com.alibaba.csp.sentinel.demo.cluster.entity.CustomizedFlowRule;
-import com.alibaba.csp.sentinel.demo.cluster.entity.SentinelFlowRule;
+import com.alibaba.csp.sentinel.demo.cluster.handler.MergeFlowRuleHandler;
+import com.alibaba.csp.sentinel.demo.cluster.handler.OverAllFlowRuleHandler;
+import com.alibaba.csp.sentinel.demo.cluster.handler.SingleFlowRuleHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HandlerFactory {
-    private static final Map<Class<?>, Handler> handlerRegistry = new HashMap<>();
+    private static final Map<Integer, AbstractHandler> handlerRegistry = new HashMap<>();
 
     static {
         // Register default handlers
-        handlerRegistry.put(CustomizedFlowRule.class, new CustomizedFlowRuleHandler(null));
-        handlerRegistry.put(SentinelFlowRule.class, new SentinelFlowRuleHandler(null));
+        registerHandler(new CustomizedFlowRuleHandler());
+        registerHandler(new SingleFlowRuleHandler());
+        registerHandler(new OverAllFlowRuleHandler());
+        registerHandler(new MergeFlowRuleHandler());
     }
 
-    public static Handler getHandler(Object rule) {
+    public static AbstractHandler getHandler(Object rule) {
         return handlerRegistry.get(rule.getClass());
     }
 
-    public static void registerHandler(Class<?> ruleClass, Handler handler) {
-        handlerRegistry.put(ruleClass, handler);
+    public static void registerHandler(AbstractHandler handler) {
+        handlerRegistry.put(handler.getStatus(), handler);
     }
 }

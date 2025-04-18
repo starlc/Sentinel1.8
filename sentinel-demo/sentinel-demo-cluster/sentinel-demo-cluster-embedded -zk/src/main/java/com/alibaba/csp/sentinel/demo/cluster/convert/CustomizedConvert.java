@@ -12,6 +12,8 @@ import com.alibaba.csp.sentinel.slots.block.ClusterRuleConstant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomizedConvert implements Converter<List<CustomizedFlowRule>, List<FlowRule>>{
     @Override
@@ -19,31 +21,11 @@ public class CustomizedConvert implements Converter<List<CustomizedFlowRule>, Li
         if (customizedFlowRules == null || customizedFlowRules.isEmpty()) {
             return new ArrayList<>();
         }
-        
+        Map<String,List<String>> cache = new ConcurrentHashMap<>();
         List<FlowRule> flowRules = new ArrayList<>(customizedFlowRules.size());
         for (CustomizedFlowRule rule : customizedFlowRules) {
-            AbstractHandler handler = (AbstractHandler) HandlerFactory.getHandler(rule);
-            FlowRule flowRule = handler.createFlowRule(rule);
-            flowRule.setCount(rule.getCount());
-            flowRule.setGrade(rule.getGrade());
-            flowRule.setStrategy(rule.getStrategy());
-            
-            // 设置关联资源，如果有的话
-            if (rule.getStrategy() == RuleConstant.STRATEGY_RELATE && rule.getResourceVal() != null) {
-                flowRule.setRefResource(rule.getResourceVal());
-            }
-            
-            // 当grade为QPS模式时，创建ClusterModeConfig对象
-            if (rule.getGrade() == RuleConstant.FLOW_GRADE_QPS) {
-                flowRule.setClusterMode(true);
-                ClusterFlowConfig clusterConfig = new ClusterFlowConfig();
-                clusterConfig.setFlowId(rule.getFlowId());
-                clusterConfig.setThresholdType(ClusterRuleConstant.FLOW_THRESHOLD_GLOBAL);
-                clusterConfig.setSampleCount(1);
-                clusterConfig.setFallbackToLocalWhenFail(true);
-                flowRule.setClusterConfig(clusterConfig);
-            }
-            
+            AbstractHandler handler = HandlerFactory.getHandler(rule);
+            FlowRule flowRule = handler.handlerRule(rule,cache);
             flowRules.add(flowRule);
         }
         

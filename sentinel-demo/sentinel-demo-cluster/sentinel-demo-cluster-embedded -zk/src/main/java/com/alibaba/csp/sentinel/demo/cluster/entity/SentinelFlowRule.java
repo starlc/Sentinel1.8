@@ -1,6 +1,6 @@
 package com.alibaba.csp.sentinel.demo.cluster.entity;
 
-public class SentinelFlowRule {
+public class SentinelFlowRule implements FlowRuleEntity {
     private Long flowId;
 
     private String resource;
